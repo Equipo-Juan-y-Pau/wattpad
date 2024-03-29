@@ -1,0 +1,6 @@
+@SocialInteraction_HostAddress = http://localhost:5124
+
+GET {{SocialInteraction_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
