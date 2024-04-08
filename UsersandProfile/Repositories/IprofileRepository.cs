@@ -4,10 +4,10 @@ namespace UsersandProfile.Repositories
 {
     public interface IProfileRepository
     {
-        IEnumerable<Profile> GetAll();
-        Profile GetById(int id);
-        Profile Add(Profile profile);
-        Profile Update(Profile profile);
-        void Delete(int id);
+        Task<IEnumerable<Profile>> GetAll();
+        Task<Profile> GetById(int id);
+        Task<Profile> Add(Profile profile);
+        Task<Profile> Update(Profile profile);
+        Task<bool> Delete(int id);
     }
 }

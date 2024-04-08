@@ -1,80 +1,63 @@
 ﻿using UsersandProfile.Models;
-using UsersandProfile.Datos;
 using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
 namespace UsersandProfile.Repositories
 {
     public class ProfileRepository : IProfileRepository
     {
-        //private readonly List<Profile> _profiles;
-        private int _nextId = 3;
-        /*
-        public ProfileRepository()
+        private readonly ApplicationDbContext _profile;
+
+        public ProfileRepository(ApplicationDbContext bd)
         {
-            // Inicializa la lista con algunos datos de ejemplo.
-            _profiles = new List<Profile>
+            _profile = bd;
+        }
+        
+
+        public async Task<IEnumerable<Profile>> GetAll()
+        {
+            return await _profile.Perfiles.ToListAsync();
+        }
+
+        public async Task<Profile> GetById(int id)
+        {
+            var perfil = await _profile.Perfiles.FindAsync(id);
+            if (perfil != null)
             {
-                new Profile { Id = _nextId++, Nombre = "Paula", Avatar = "avatar1.png" },
-                new Profile { Id = _nextId++, Nombre = "Juan", Avatar = "avatar2.png" },
-                new Profile { Id = _nextId++, Nombre = "Mimosa", Avatar = "avatar3.png" }
-            };
-        }
-        */
-
-        public IEnumerable<Profile> GetAll()
-        {
-            //return _profiles;
-            return (IEnumerable<Profile>)ProfileStore.profileList;
-        }
-
-        public Profile GetById(int id)
-        {
-            //return _profiles.Find(p => p.Id == id);
-            return ProfileStore.profileList.Find(p => p.Id == id);
-        }
-
-        public Profile Add(Profile profile)
-        {
-            if (profile == null)
-            {
-                throw new ArgumentNullException(nameof(profile));
+                return await _profile.Perfiles.FindAsync(id);
             }
+            throw new KeyNotFoundException($"No se encontró un perfil con el ID: {id}");
+        }
 
-            profile.Id = _nextId++;
-            ProfileStore.profileList.Add(profile);
+        public async Task<Profile> Add(Profile profile)
+        {
+
+            _profile.Set<Profile>().Add(profile);
+            await _profile.SaveChangesAsync();
             return profile;
+
         }
 
-        public Profile Update(Profile profile)
+        public async Task<Profile> Update(Profile profile)
         {
-            if (profile == null)
-            {
-                throw new ArgumentNullException(nameof(profile));
-            }
-
-            var existingProfile = ProfileStore.profileList.Find(p => p.Id == profile.Id);
-            if (existingProfile == null)
-            {
-                throw new KeyNotFoundException("El perfil no existe");
-            }
-
-            existingProfile.Nombre = profile.Nombre;
-            existingProfile.Avatar = profile.Avatar;
-
-            return existingProfile;
+            _profile.Entry(profile).State = EntityState.Modified;
+            await _profile.SaveChangesAsync();
+            return  profile;
         }
 
-        public void Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            var profile = ProfileStore.profileList.Find(p => p.Id == id);
-            if (profile == null)
+            var perfil = await _profile.Perfiles.FindAsync(id);
+            if (perfil != null)
             {
-                throw new KeyNotFoundException("El perfil no existe");
+                _profile.Perfiles.Remove(perfil);
+                await _profile.SaveChangesAsync();
+                return true;
             }
+            return false;
 
-
-            ProfileStore.profileList.Remove(profile);
         }
     }
 }

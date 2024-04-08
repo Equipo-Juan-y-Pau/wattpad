@@ -4,10 +4,10 @@ namespace UsersandProfile.Services
 {
     public interface IProfileService
     {
-        IEnumerable<Profile> GetAll();
-        Profile GetById(int id);
-        Profile Add(Profile profile);
-        Profile Update(int id, Profile profile);
-        void Delete(int id);
+        Task<IEnumerable<Profile>> GetAll();
+        Task<Profile> GetById(int id);
+        Task<Profile> Add(Profile profile);
+        Task<Profile> Update(int id, Profile profile);
+        Task<bool> Delete(int id);
     }
 }

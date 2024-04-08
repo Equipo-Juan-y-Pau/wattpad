@@ -1,10 +1,8 @@
 // PerfilController.cs
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using UsersandProfile.Models;
 using UsersandProfile.Services;
-using System;
-using System.Collections.Generic;
 
 namespace UsersandProfile.Controllers
 {
@@ -12,37 +10,44 @@ namespace UsersandProfile.Controllers
     [Route("[controller]")]
     public class ProfileController : ControllerBase
     {
+        private readonly ILogger<ProfileController> _logger;
         private readonly IProfileService _profileService;
 
-        public ProfileController(IProfileService profileService)
+        public ProfileController(ILogger<ProfileController> logger, IProfileService profileService)
         {
+            _logger = logger;
             _profileService = profileService;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<Profile>> GetProfiles()
+        public async Task<ActionResult<IEnumerable<Profile>>> GetProfiles()
         {
+            _logger.LogInformation("Entro al controlador");
             try
             {
-                var profiles = _profileService.GetAll();
-                return Ok(profiles);
+            var profiles = await _profileService.GetAll();
+            return Ok(profiles);
             }
+            
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
+            
         }
-
+      
+        [Authorize]
         [HttpGet("{id:int}", Name = "GetProfile")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public ActionResult<Profile> GetProfile(int id)
+        public async Task<ActionResult<Profile>> GetProfile(int id)
         {
             try
             {
-                var profile = _profileService.GetById(id);
+                var profile = await _profileService.GetById(id);
                 if (profile == null)
                 {
                     return NotFound();
@@ -59,7 +64,7 @@ namespace UsersandProfile.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<Profile> CreateProfile([FromBody] Profile profile)
+        public async Task<ActionResult<Profile>> CreateProfile([FromBody] Profile profile)
         {
             try
             {
@@ -73,7 +78,7 @@ namespace UsersandProfile.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var createdProfile = _profileService.Add(profile);
+                var createdProfile = await _profileService.Add(profile);
 
                 return CreatedAtRoute("GetProfile", new { id = createdProfile.Id }, createdProfile);
             }
@@ -87,7 +92,7 @@ namespace UsersandProfile.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult DeleteProfile(int id)
+        public async Task<ActionResult<bool>> DeleteProfile(int id)
         {
             try
             {
@@ -96,8 +101,13 @@ namespace UsersandProfile.Controllers
                     return BadRequest();
                 }
 
-                _profileService.Delete(id);
+                var deleted = await _profileService.Delete(id);
 
+                if (!deleted)
+                {
+                    return NotFound($"Perfil con ID {id} no encontrado.");
+                }
+                
                 return NoContent();
             }
             catch (Exception ex)
@@ -110,7 +120,7 @@ namespace UsersandProfile.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public IActionResult UpdateProfile(int id, [FromBody] Profile profile)
+        public async Task<IActionResult> UpdateProfile(int id, [FromBody] Profile profile)
         {
             try
             {
@@ -119,7 +129,7 @@ namespace UsersandProfile.Controllers
                     return BadRequest();
                 }
 
-                var updatedProfile = _profileService.Update(id, profile);
+                var updatedProfile = await _profileService.Update(id, profile);
 
                 return NoContent();
             }

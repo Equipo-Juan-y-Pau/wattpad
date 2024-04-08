@@ -15,31 +15,29 @@ namespace UsersandProfile.Services
             _profileRepository = profileRepository;
         }
 
-        public IEnumerable<Profile> GetAll()
+        public async Task<IEnumerable<Profile>> GetAll()
         {
-            return _profileRepository.GetAll();
+            return await _profileRepository.GetAll();
         }
 
-        public Profile GetById(int id)
+        public async Task<Profile> GetById(int id)
         {
-            return _profileRepository.GetById(id);
+            return await _profileRepository.GetById(id);
         }
 
-        public Profile Add(Profile profile)
+        public async Task<Profile> Add(Profile profile)
         {
-
-            return _profileRepository.Add(profile);
+            return await _profileRepository.Add(profile);
         }
 
-        public Profile Update(int id, Profile profile)
+        public async Task<Profile> Update(int id, Profile profile)
         {
-
-            return _profileRepository.Update(profile);
+            return await _profileRepository.Update(profile);
         }
 
-        public void Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            _profileRepository.Delete(id);
+            return await _profileRepository.Delete(id);
         }
     }
 }

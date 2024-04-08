@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using UsersandProfile.Repositories;
@@ -6,21 +7,10 @@ using UsersandProfile.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    // Configura un puerto HTTP
-    serverOptions.ListenLocalhost(5002); // El puerto HTTP en localhost
-
-    // Configura un puerto HTTPS
-    serverOptions.ListenLocalhost(7001, listenOptions =>
-    {
-        listenOptions.UseHttps(); // Utilizará el certificado de desarrollo de ASP.NET Core automáticamente
-    });
-});
-
+// Agrega la autenticaciÃ³n JWT Bearer
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
-    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
@@ -32,10 +22,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
+// Configura DbContext para usar PostgreSQL
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 // Agrega servicios al contenedor.
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
+
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 
