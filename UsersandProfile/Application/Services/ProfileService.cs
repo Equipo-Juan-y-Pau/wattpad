@@ -1,8 +1,5 @@
 // Services/PedidoService.cs
 using ServicioProfiles.Models;
-using ServicioProfiles.Repositories;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace ServicioProfiles.Services
 {
@@ -38,5 +35,6 @@ namespace ServicioProfiles.Services
         {
             return await _profileRepository.UpdateProfileAsync(profileToUpdate);
         }
+
     }
 }

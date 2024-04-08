@@ -77,7 +77,6 @@ namespace UsersandProfile.Controllers
             return NoContent();
         }
 
-        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProfile(int id, Profile profile)
         {
@@ -95,5 +94,6 @@ namespace UsersandProfile.Controllers
 
             return Ok(updatedProfile);
         }
+
     }
 }
