@@ -1,8 +1,8 @@
-using ServicioProfiles.Models;
+using UsersandProfile.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ServicioProfiles.Services
+namespace UsersandProfile.Services
 {
     public interface IProfileService
     {

@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using ServicioProfiles.Models;
+using UsersandProfile.Models;
 using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
 
-namespace ServicioProfiles.Repositories
+namespace UsersandProfile.Repositories
 {   
     public class ProfileRepository : IProfileRepository
     {
