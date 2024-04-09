@@ -1,6 +1,19 @@
 {
   "format": 1,
   "restore": {
+<<<<<<< HEAD
+    "C:\\Users\\paula\\Desktop\\wattpad\\SocialInteraction\\SocialInteraction.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\paula\\Desktop\\wattpad\\SocialInteraction\\SocialInteraction.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\paula\\Desktop\\wattpad\\SocialInteraction\\SocialInteraction.csproj",
+        "projectName": "SocialInteraction",
+        "projectPath": "C:\\Users\\paula\\Desktop\\wattpad\\SocialInteraction\\SocialInteraction.csproj",
+        "packagesPath": "C:\\Users\\paula\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\paula\\Desktop\\wattpad\\SocialInteraction\\obj\\",
+=======
     "C:\\Users\\juanj\\Escritorio\\wattpad\\SocialInteraction\\SocialInteraction.csproj": {}
   },
   "projects": {
@@ -12,6 +25,7 @@
         "projectPath": "C:\\Users\\juanj\\Escritorio\\wattpad\\SocialInteraction\\SocialInteraction.csproj",
         "packagesPath": "C:\\Users\\juanj\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\juanj\\Escritorio\\wattpad\\SocialInteraction\\obj\\",
+>>>>>>> develop
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\juanj\\AppData\\Roaming\\NuGet\\NuGet.Config",

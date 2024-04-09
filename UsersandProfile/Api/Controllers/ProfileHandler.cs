@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ServicioProfiles.Models;
-using ServicioProfiles.Services;
+using UsersandProfile.Models;
+using UsersandProfile.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

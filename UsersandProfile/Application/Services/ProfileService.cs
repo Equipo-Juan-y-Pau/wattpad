@@ -1,7 +1,7 @@
 // Services/PedidoService.cs
-using ServicioProfiles.Models;
+using UsersandProfile.Models;
 
-namespace ServicioProfiles.Services
+namespace UsersandProfile.Services
 {
     public class ProfileService : IProfileService
     {
