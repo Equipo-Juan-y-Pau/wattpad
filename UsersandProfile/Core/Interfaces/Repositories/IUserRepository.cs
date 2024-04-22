@@ -8,7 +8,7 @@ namespace UsersandProfile.Repositories
 
         Task<bool> register(User user);
 
-        Task<User> userExist(UserDto userDto);
+        Task<User?> userExist(UserDto userDto);
 
         Task<User?> GetUserById(int id);
 

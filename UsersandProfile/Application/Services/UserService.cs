@@ -77,14 +77,25 @@ namespace UsersandProfile.Services
                 if (isPasswordValid)
                 {
                     var user = await _userRepository.userExist(userDto);
-                    var token = GenerateJWTToken(user);
 
-                    response.Success = true;
-                    response.Data = token;
+                    if (user != null)
+                    {
+                        var token = GenerateJWTToken(user);
+                        response.Success = true;
+                        response.Data = token;
+                    }
+                    else
+                    {
+                        response.Success = false;
+                        response.Message = "Usuario no encontrado.";
+                    }
                 }
-
+                else
+                {
+                    response.Success = false;
+                    response.Message = "Contraseña incorrecta.";
+                }
             }
-
             catch (Exception ex)
             {
                 response.Success = false;
@@ -93,17 +104,24 @@ namespace UsersandProfile.Services
             return response;
         }
 
+
         private string GenerateJWTToken(User user)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var jwtKey = _configuration["Jwt:Key"];
+            if (string.IsNullOrEmpty(jwtKey))
+            {
+                throw new InvalidOperationException("La clave JWT no está configurada correctamente.");
+            }
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var userClaims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username!),
-                new Claim(ClaimTypes.Email, user.Email!)
-
+                new Claim(ClaimTypes.Name, user.Username ?? "Desconocido"),
+                new Claim(ClaimTypes.Email, user.Email ?? "no-email@provided.com")
             };
+
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:issuer"],
                 audience: _configuration["Jwt:audience"],
@@ -111,6 +129,7 @@ namespace UsersandProfile.Services
                 expires: DateTime.Now.AddDays(5),
                 signingCredentials: credentials
             );
+
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 

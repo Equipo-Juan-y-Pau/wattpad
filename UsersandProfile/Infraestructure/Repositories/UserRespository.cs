@@ -34,7 +34,7 @@ namespace UsersandProfile.Repositories
             return BCrypt.Net.BCrypt.Verify(userDto.Password, user.Password);
         }
 
-        public async Task<User> userExist(UserDto userDto)
+        public async Task<User?> userExist(UserDto userDto)
         {
             var userByUsername = await _user.Usuarios.FirstOrDefaultAsync(u => u.Username == userDto.Username);
             var userByEmail = await _user.Usuarios.FirstOrDefaultAsync(u => u.Email == userDto.Email);
