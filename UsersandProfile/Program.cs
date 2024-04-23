@@ -1,14 +1,23 @@
-
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.Text;
 using UsersandProfile.Repositories;
 using UsersandProfile.Services;
+using Microsoft.OpenApi.Models;
+using System.Reflection; 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Agrega la autenticación JWT Bearer
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug() 
+    .WriteTo.Console() 
+    .WriteTo.File("logs/application.log", rollingInterval: RollingInterval.Day) 
+    .CreateLogger();
+
+builder.Host.UseSerilog(); 
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     var jwtKey = builder.Configuration["Jwt:Key"];
@@ -28,28 +37,43 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
-// Configura DbContext para usar PostgreSQL
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Agrega servicios al contenedor.
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IProfileRepository, ProfileRepository>();
-
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-var app = builder.Build();
-
-// Configura la solicitud HTTP pipeline.
-if (app.Environment.IsDevelopment())
+// Add Swagger configuration
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
 {
-    app.UseDeveloperExceptionPage();
-}
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Users and Profile API", Version = "v1" });
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath); 
+});
+
+
+
+var app = builder.Build();
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Users and Profile API V1");
+    c.RoutePrefix = string.Empty; 
+});
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+Log.Information("Starting application");
+
 app.Run();
+
+app.Lifetime.ApplicationStopped.Register(Log.CloseAndFlush);
