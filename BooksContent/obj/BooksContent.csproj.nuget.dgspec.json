@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\paula\\Desktop\\wattpad\\BooksContent\\BooksContent.csproj": {}
+    "C:\\Users\\juanj\\Escritorio\\wattpad\\BooksContent\\BooksContent.csproj": {}
   },
   "projects": {
-    "C:\\Users\\paula\\Desktop\\wattpad\\BooksContent\\BooksContent.csproj": {
+    "C:\\Users\\juanj\\Escritorio\\wattpad\\BooksContent\\BooksContent.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\paula\\Desktop\\wattpad\\BooksContent\\BooksContent.csproj",
+        "projectUniqueName": "C:\\Users\\juanj\\Escritorio\\wattpad\\BooksContent\\BooksContent.csproj",
         "projectName": "BooksContent",
-        "projectPath": "C:\\Users\\paula\\Desktop\\wattpad\\BooksContent\\BooksContent.csproj",
-        "packagesPath": "C:\\Users\\paula\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\paula\\Desktop\\wattpad\\BooksContent\\obj\\",
+        "projectPath": "C:\\Users\\juanj\\Escritorio\\wattpad\\BooksContent\\BooksContent.csproj",
+        "packagesPath": "C:\\Users\\juanj\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\juanj\\Escritorio\\wattpad\\BooksContent\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\paula\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\juanj\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -26,7 +22,6 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -39,6 +34,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -48,6 +48,10 @@
             "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
               "target": "Package",
               "version": "[1.19.5, )"
+            },
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[2.25.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -73,7 +77,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.203/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

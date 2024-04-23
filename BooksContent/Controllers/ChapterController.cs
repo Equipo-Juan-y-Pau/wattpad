@@ -1,62 +1,62 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using UsersandProfile.Models;
-using UsersandProfile.Services;
+using BooksContent.Models;
+//using BooksContent.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace UsersandProfile.Controllers
+namespace UsersandChapter.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ProfileController : ControllerBase
+    public class ChapterController : ControllerBase
     {
-        private readonly IProfileService _profileService;
+        private readonly IChapterService _chapterService;
 
-        public ProfileController(IProfileService profileService)
+        public ChapterController(IChapterService chapterService)
         {
-            _profileService = profileService;
+            _chapterService = chapterService;
         }
 
-        // GET: Profiles
+        // GET: Chapters
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Profile>>> GetProfiles()
+        public async Task<ActionResult<IEnumerable<Chapter>>> GetChapters()
         {
-            var profiles = await _profileService.GetProfiles(); // Aquí también ajusta el nombre del método
-            return Ok(profiles);
+            var chapters = await _chapterService.GetChapters(); // Aquí también ajusta el nombre del método
+            return Ok(chapters);
         }
 
-        // GET: Profiles/5
+        // GET: Chapters/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Profile>> GetProfileByID(int id)
+        public async Task<ActionResult<Chapter>> GetChapterByID(int id)
         {
-            var profile = await _profileService.GetProfileByID(id);
+            var chapter = await _chapterService.GetChapterByID(id);
 
-            if (profile == null)
+            if (chapter == null)
             {
                 return NotFound($"No se encontró un perfil con el ID {id}.");
             }
 
-            return Ok(profile);
+            return Ok(chapter);
         }
 
-        // POST: Profiles
+        // POST: Chapters
         [HttpPost]
-        public async Task<ActionResult<Profile>> CreateProfile([FromBody] Profile profile)
+        public async Task<ActionResult<Chapter>> CreateChapter([FromBody] Chapter chapter)
         {
-            if (profile == null)
+            if (chapter == null)
             {
                 return BadRequest("El perfil proporcionado es nulo.");
             }
             try
             {
-                var createdProfile = await _profileService.CreateProfile(profile);
-                if (createdProfile == null)
+                var createdChapter = await _chapterService.CreateChapter(chapter);
+                if (createdChapter == null)
                 {
                     return NotFound("No se pudo crear el perfil.");
                 }
 
-                return CreatedAtAction(nameof(GetProfileByID), new { id = createdProfile.Id }, createdProfile);
+                return CreatedAtAction(nameof(GetChapterByID), new { id = createdChapter.Id }, createdChapter);
             }
             catch (Exception ex)
             {
@@ -65,9 +65,9 @@ namespace UsersandProfile.Controllers
         }   
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProfile(int id)
+        public async Task<IActionResult> DeleteChapter(int id)
         {
-            var wasDeleted = await _profileService.DeleteProfile(id);
+            var wasDeleted = await _chapterService.DeleteChapter(id);
 
             if (!wasDeleted)
             {
@@ -78,21 +78,21 @@ namespace UsersandProfile.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProfile(int id, Profile profile)
+        public async Task<IActionResult> PutChapter(int id, Chapter chapter)
         {
-            if (id != profile.Id)
+            if (id != chapter.Id)
             {
                 return BadRequest("El ID del perfil no coincide con el ID Proporcionado.");
             }
 
-            var updatedProfile = await _profileService.UpdateProfile(profile);
+            var updatedChapter = await _chapterService.UpdateChapter(chapter);
 
-            if (updatedProfile == null)
+            if (updatedChapter == null)
             {
                 return NotFound($"No se encontró un perfil con el ID {id}.");
             }
 
-            return Ok(updatedProfile);
+            return Ok(updatedChapter);
         }
 
     }
