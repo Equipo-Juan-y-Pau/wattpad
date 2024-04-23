@@ -8,19 +8,21 @@ namespace BooksContent.Models
     public class Chapter
     {
         [Column("id")]
-        [JsonPropertyName("id")]
         public int Id { get; set; }
 
-        [Column("nombre")]
-        [JsonPropertyName("nombre")]
-        public required string NombreCompleto{ get; set; }
+        [Column("title")]
+        public required string Title{ get; set; }
 
-        [Column("avatar_url")]
-        [JsonPropertyName("avatar_url")]
+        [Column("numero")]
         public string? AvatarURL { get; set; }
 
-        [Column("foto_url")]
-        [JsonPropertyName("foto_perfil_url")]
-        public string? FotoPerfilURL { get; set; }
+        [Column("fecha_registro")]
+        public string? FechaRegistro { get; set; }
+
+        [Column("content")]
+        public string? Content { get; set; }
+
+        [Column("book_id")]
+        public string? BookId { get; set; }
     }
 }

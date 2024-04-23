@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks; 
 using BooksContent.Models; 
-public interface IChapterRepository
+public interface IChapterService
 {
     Task<IEnumerable<Chapter>> GetChaptersAsync();
     Task<Chapter?> GetChapterByIDAsync(int id);
