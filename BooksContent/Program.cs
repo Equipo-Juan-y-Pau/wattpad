@@ -1,25 +1,61 @@
-var builder = WebApplication.CreateBuilder(args);
+    using System.Text;
+    using BooksContent.Services;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.IdentityModel.Tokens;
+    using MongoDB.Driver;
 
-// Add services to the container.
+    var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+    // Configuración de la cadena de conexión MongoDB desde appsettings.json
+    builder.Configuration.AddJsonFile("appsettings.json");
 
-var app = builder.Build();
+    // Configurar la conexión a MongoDB
+    var connectionString = builder.Configuration.GetConnectionString("MongoDBConnection");
+    var mongoClient = new MongoClient(connectionString);
+    var mongoDatabase = mongoClient.GetDatabase("mongodb"); 
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    // Configuración del servicio BooksRepository con la conexión a MongoDB
+    builder.Services.AddScoped<IBooksRepository>(provider => new BooksRepository(mongoDatabase));
 
-app.UseHttpsRedirection();
+    // Configuración del servicio BooksService
+    builder.Services.AddScoped<IBooksService, BooksService>();
 
-app.UseAuthorization();
+    builder.Services.AddControllers().AddNewtonsoftJson();
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
 
-app.MapControllers();
+    builder.Services.AddHttpContextAccessor();
 
-app.Run();
+    // Agrega la autenticación JWT Bearer
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+    {
+        var jwtKey = builder.Configuration["Jwt:Key"];
+        if (string.IsNullOrEmpty(jwtKey))
+        {
+            throw new InvalidOperationException("La clave secreta JWT no está configurada.");
+        }
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        };
+    });
+
+    var app = builder.Build();
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseAuthorization();
+    app.MapControllers();
+    app.Run();
