@@ -11,9 +11,18 @@ using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug() 
-    .WriteTo.Console() 
-    .WriteTo.File("logs/application.log", rollingInterval: RollingInterval.Day) 
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .WriteTo.File("logs/application.log", rollingInterval: RollingInterval.Day)
+    .WriteTo.Logger(lc => lc
+        .Filter.ByIncludingOnly(evt => evt.Level == Serilog.Events.LogEventLevel.Information)
+        .WriteTo.File("logs/information.log", rollingInterval: RollingInterval.Day))
+    .WriteTo.Logger(lc => lc
+        .Filter.ByIncludingOnly(evt => evt.Level == Serilog.Events.LogEventLevel.Warning)
+        .WriteTo.File("logs/warning.log", rollingInterval: RollingInterval.Day))
+    .WriteTo.Logger(lc => lc
+        .Filter.ByIncludingOnly(evt => evt.Level == Serilog.Events.LogEventLevel.Error)
+        .WriteTo.File("logs/error.log", rollingInterval: RollingInterval.Day))
     .CreateLogger();
 
 builder.Host.UseSerilog(); 

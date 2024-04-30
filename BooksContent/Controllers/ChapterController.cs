@@ -4,11 +4,12 @@ using BooksContent.Models;
 //using BooksContent.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 
-namespace UsersandChapter.Controllers
+namespace BooksContent.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("books/{bookId}/chapters")] 
     public class ChapterController : ControllerBase
     {
         private readonly IChapterService _chapterService;
@@ -18,81 +19,75 @@ namespace UsersandChapter.Controllers
             _chapterService = chapterService;
         }
 
-        // GET: Chapters
+        // GET: books/{bookId}/chapters
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Chapter>>> GetChapters()
+        public async Task<ActionResult<IEnumerable<Chapter>>> GetChapters(string bookId)
         {
-            var chapters = await _chapterService.GetChapters(); // Aquí también ajusta el nombre del método
+            var chapters = await _chapterService.GetChaptersAsync(bookId); 
+            
+            if (chapters == null || chapters.Count() == 0)
+            {
+                return NotFound($"No se encontraron capitulos para el bookID: {bookId}");
+            }
+
             return Ok(chapters);
         }
 
-        // GET: Chapters/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Chapter>> GetChapterByID(int id)
+        // GET: books/{bookId}/chapters/{chapterId}
+        [HttpGet("{chapterId}")]
+        public async Task<ActionResult<Chapter>> GetChapterById(string bookId, string chapterId)
         {
-            var chapter = await _chapterService.GetChapterByID(id);
+            var chapter = await _chapterService.GetChapterByIDAsync(bookId, chapterId);
 
             if (chapter == null)
             {
-                return NotFound($"No se encontró un perfil con el ID {id}.");
+                return NotFound($"No se encontro el capitulo con id: {chapterId} para el libro con bookId: {bookId}");
             }
 
             return Ok(chapter);
         }
 
-        // POST: Chapters
         [HttpPost]
-        public async Task<ActionResult<Chapter>> CreateChapter([FromBody] Chapter chapter)
+        public async Task<ActionResult<Chapter>> CreateProfile([FromBody] Chapter chapter)
         {
             if (chapter == null)
             {
-                return BadRequest("El perfil proporcionado es nulo.");
+                return BadRequest("Los datos del capitulo son nulos.");
             }
+
             try
             {
-                var createdChapter = await _chapterService.CreateChapter(chapter);
+                var createdChapter = await _chapterService.CreateChapterAsync(chapter);
                 if (createdChapter == null)
                 {
-                    return NotFound("No se pudo crear el perfil.");
+                    return NotFound("No se pudo crear el capitulo.");
                 }
 
-                return CreatedAtAction(nameof(GetChapterByID), new { id = createdChapter.Id }, createdChapter);
+                return CreatedAtAction(nameof(GetChapterById), new { id = createdChapter.Id }, createdChapter);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, $"Error interno del servidor al crear el capitulo: {ex}");
             }
-        }   
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteChapter(int id)
-        {
-            var wasDeleted = await _chapterService.DeleteChapter(id);
-
-            if (!wasDeleted)
-            {
-                return NotFound($"No se encontró un perfil con el ID {id}.");
-            }
-
-            return NoContent();
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutChapter(int id, Chapter chapter)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProfile(string id)
         {
-            if (id != chapter.Id)
+            try
             {
-                return BadRequest("El ID del perfil no coincide con el ID Proporcionado.");
+                var wasDeleted = await _chapterService.DeleteChapterAsync(id);
+                if (!wasDeleted)
+                {
+                    return NotFound($"Capitulo con ID: {id} no encontrado.");
+                }
+
+                return NoContent();
             }
-
-            var updatedChapter = await _chapterService.UpdateChapter(chapter);
-
-            if (updatedChapter == null)
+            catch (Exception ex)
             {
-                return NotFound($"No se encontró un perfil con el ID {id}.");
+                return StatusCode(500, $"Error interno del servidor al eliminar el perfil con ID: {id}, {ex}");
             }
-
-            return Ok(updatedChapter);
         }
 
     }

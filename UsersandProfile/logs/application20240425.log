@@ -1,0 +1,22 @@
+2024-04-25 01:47:12.802 -05:00 [DBG] Registered model binder providers, in the following order: ["Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BinderTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ServicesModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BodyModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.HeaderModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FloatingPointTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.EnumTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.DateTimeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.SimpleTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.TryParseModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.CancellationTokenModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ByteArrayModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FormFileModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FormCollectionModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.KeyValuePairModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.DictionaryModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ArrayModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.CollectionModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ComplexObjectModelBinderProvider"]
+2024-04-25 01:47:12.973 -05:00 [INF] Starting application
+2024-04-25 01:47:12.980 -05:00 [DBG] Hosting starting
+2024-04-25 01:47:13.202 -05:00 [INF] User profile is available. Using 'C:\Users\juanj\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2024-04-25 01:47:13.211 -05:00 [DBG] Reading data from file 'C:\Users\juanj\AppData\Local\ASP.NET\DataProtection-Keys\key-d1d5a438-28e5-46e4-aef8-e9a649d15eb1.xml'.
+2024-04-25 01:47:13.241 -05:00 [DBG] Found key {d1d5a438-28e5-46e4-aef8-e9a649d15eb1}.
+2024-04-25 01:47:13.251 -05:00 [DBG] Considering key {d1d5a438-28e5-46e4-aef8-e9a649d15eb1} with expiration date 2024-07-01 22:43:54Z as default key.
+2024-04-25 01:47:13.256 -05:00 [DBG] Forwarded activator type request from Microsoft.AspNetCore.DataProtection.XmlEncryption.DpapiXmlDecryptor, Microsoft.AspNetCore.DataProtection, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60 to Microsoft.AspNetCore.DataProtection.XmlEncryption.DpapiXmlDecryptor, Microsoft.AspNetCore.DataProtection, Culture=neutral, PublicKeyToken=adb9793829ddae60
+2024-04-25 01:47:13.260 -05:00 [DBG] Decrypting secret element using Windows DPAPI.
+2024-04-25 01:47:13.263 -05:00 [DBG] Forwarded activator type request from Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60 to Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Culture=neutral, PublicKeyToken=adb9793829ddae60
+2024-04-25 01:47:13.270 -05:00 [DBG] Opening CNG algorithm 'AES' from provider 'null' with chaining mode CBC.
+2024-04-25 01:47:13.275 -05:00 [DBG] Opening CNG algorithm 'SHA256' from provider 'null' with HMAC.
+2024-04-25 01:47:13.279 -05:00 [DBG] Using key {d1d5a438-28e5-46e4-aef8-e9a649d15eb1} as the default key.
+2024-04-25 01:47:13.281 -05:00 [DBG] Key ring with default key {d1d5a438-28e5-46e4-aef8-e9a649d15eb1} was loaded during application startup.
+2024-04-25 01:47:13.815 -05:00 [WRN] Overriding address(es) 'http://localhost:5248'. Binding to endpoints defined via IConfiguration and/or UseKestrel() instead.
+2024-04-25 01:47:13.868 -05:00 [INF] Now listening on: http://localhost:5000
+2024-04-25 01:47:13.870 -05:00 [INF] Now listening on: https://localhost:5001
+2024-04-25 01:47:13.872 -05:00 [DBG] Loaded hosting startup assembly UsersandProfile
+2024-04-25 01:47:13.875 -05:00 [INF] Application started. Press Ctrl+C to shut down.
+2024-04-25 01:47:13.881 -05:00 [INF] Hosting environment: Development
+2024-04-25 01:47:13.884 -05:00 [INF] Content root path: C:\Users\juanj\Escritorio\wattpad\UsersandProfile
+2024-04-25 01:47:13.888 -05:00 [DBG] Hosting started

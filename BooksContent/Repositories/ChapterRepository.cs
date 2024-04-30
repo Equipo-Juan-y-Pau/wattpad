@@ -19,8 +19,9 @@ namespace BooksContent.Repositories
             return await _chapters.Find(_ => true).ToListAsync();
         }
 
-        public async Task<Chapter?> GetChapterByIDAsync(int id)
+        public async Task<Chapter?> GetChapterByIDAsync(string id, string bookId)
         {
+            var filter = Builders<Chapter>.Filter.Eq(c => c.Id, id) & Builders<Chapter>.Filter.Eq(c => c.BookId, bookId);
             return await _chapters.Find(chapter => chapter.Id == id).FirstOrDefaultAsync();
         }
 
@@ -30,7 +31,7 @@ namespace BooksContent.Repositories
             return chapter;
         }
 
-        public async Task<bool> DeleteChapterAsync(int id)
+        public async Task<bool> DeleteChapterAsync(string id)
         {
             var result = await _chapters.DeleteOneAsync(chapter => chapter.Id == id);
             return result.DeletedCount > 0;
