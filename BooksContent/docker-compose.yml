@@ -1,14 +1,16 @@
 version: '3.9'
-
 services:
-
   mongodb:
-    image: mongo
+    image: mongo:latest
     container_name: mongodb
-    volumes:
-      - mongodb_data:/data/db
     ports:
       - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: equipojp
+      MONGO_INITDB_ROOT_PASSWORD: p2709j0905
+    volumes:
+      - mongodb_data:/data/db
 
 volumes:
   mongodb_data:
+    driver: local

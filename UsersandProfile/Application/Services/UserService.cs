@@ -1,7 +1,8 @@
+using System;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using UsersandProfile.Models;
 using UsersandProfile.Repositories;
@@ -21,110 +22,145 @@ namespace UsersandProfile.Services
             _userRepository = userRepository;
         }
 
-
-        public async Task<ServiceResponse<string>> register(UserDto userDto)
+        public async Task<ServiceResponse<string>> Register(UserDto userDto)
         {
             var response = new ServiceResponse<string>();
+            _logger.LogInformation("Attempting to register a new user.");
 
             try 
             {
-                _logger.LogInformation("Entro al servicio");
-                var exist = await _userRepository.userExist(userDto);
-                if (exist != null)
+                if (await _userRepository.UserExists(userDto)!= null)
                 {
-                    _logger.LogInformation("Entro al servicio1");
+                    _logger.LogWarning("Registration failed: User or email already exists.");
                     response.Success = false;
-                    response.Message = $"Usuario o email ya existen";
+                    response.Message = "Usuario o email ya existen";
                     return response;
                 }
 
-                
-                
-                _logger.LogInformation("Entro al servicio2");
                 var user = new User
                 {  
                     Username = userDto.Username,
                     Email = userDto.Email,
                     Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password),
                     Role = "user",
-                    Date = DateTime.UtcNow, 
+                    Date = DateTime.UtcNow,
                     Valid = false
                 };
-                await _userRepository.register(user);
+
+                await _userRepository.Register(user);
+                _logger.LogInformation($"User {user.Username} registered successfully.");
                 response.Success = true;
                 response.Message = "Usuario registrado.";
-                
-            
             }
-
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error registering user.");
                 response.Success = false;
-                response.Message = $"Hubo un error: {ex.Message}";
+                response.Message = $"Error during registration: {ex.Message}";
             }
 
             return response;
         }
 
-        public async Task<ServiceResponse<string>> login(UserDto userDto)
+        public async Task<ServiceResponse<string>> Login(LoginRequestDto loginRequest)
         {
             var response = new ServiceResponse<string>();
+            _logger.LogInformation("Intentando iniciar sesión.");
 
             try
             {
-                bool isPasswordValid = await _userRepository.login(userDto);
+                // Determina si el identificador es un correo electrónico
+                bool isEmail = new EmailAddressAttribute().IsValid(loginRequest.Identifier);
 
-                if (isPasswordValid)
+                User? user;
+
+                if (string.IsNullOrWhiteSpace(loginRequest.Identifier))
                 {
-                    var user = await _userRepository.userExist(userDto);
-                    var token = GenerateJWTToken(user);
-
-                    response.Success = true;
-                    response.Data = token;
+                    _logger.LogWarning("El identificador de inicio de sesión está vacío o es nulo.");
+                    response.Success = false;
+                    response.Message = "El identificador de inicio de sesión no puede estar vacío.";
+                    return response;
                 }
 
-            }
+                if (isEmail)
+                {
+                    // Búsqueda por correo electrónico
+                    user = await _userRepository.GetUserByEmail(loginRequest.Identifier);
+                }
+                else
+                {
+                    // Búsqueda por nombre de usuario
+                    user = await _userRepository.GetUserByUsername(loginRequest.Identifier);
+                }
 
+                // Verificar si el usuario existe y si la contraseña es correcta
+                if (user == null || !BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.Password))
+                {
+                    _logger.LogWarning("Error al iniciar sesión: Nombre de usuario/correo o contraseña incorrectos.");
+                    response.Success = false;
+                    response.Message = "Nombre de usuario/correo o contraseña incorrectos.";
+                    return response;
+                }
+
+                // Generar el token JWT
+                var token = GenerateJWTToken(user);
+                response.Success = true;
+                response.Data = token;
+                _logger.LogInformation("Inicio de sesión exitoso.");
+            }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error durante el inicio de sesión.");
                 response.Success = false;
-                response.Message = $"Hubo un error: {ex.Message}";
+                response.Message = $"Error durante el inicio de sesión: {ex.Message}";
             }
+
             return response;
         }
 
+
         private string GenerateJWTToken(User user)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var jwtKey = _configuration["Jwt:Key"];
+            if (string.IsNullOrEmpty(jwtKey))
+            {
+                _logger.LogError("JWT key configuration is missing.");
+                throw new InvalidOperationException("La clave JWT no está configurada correctamente.");
+            }
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var userClaims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username!),
-                new Claim(ClaimTypes.Email, user.Email!)
-
+                new Claim(ClaimTypes.Name, user.Username ?? "Desconocido"),
+                new Claim(ClaimTypes.Email, user.Email?? "CorreoDesconocido@email.com")
             };
+
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:issuer"],
-                audience: _configuration["Jwt:audience"],
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
                 claims: userClaims,
                 expires: DateTime.Now.AddDays(5),
                 signingCredentials: credentials
             );
+
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public async Task<bool>ChangePasswordAsync(int userId, ChangePasswordDto changePasswordDto)
+        public async Task<bool> ChangePasswordAsync(int userId, ChangePasswordDto changePasswordDto)
         {
+            _logger.LogInformation($"Attempting to change password for user ID {userId}.");
             var user = await _userRepository.GetUserById(userId);
-
-            if (user ==null || !BCrypt.Net.BCrypt.Verify(changePasswordDto.CurrentPassword, user.Password))
+            if (user == null || !BCrypt.Net.BCrypt.Verify(changePasswordDto.CurrentPassword, user.Password))
             {
+                _logger.LogWarning("Change password failed: User not found or current password is incorrect.");
                 return false;
             }
 
             user.Password = BCrypt.Net.BCrypt.HashPassword(changePasswordDto.NewPassword);
             await _userRepository.Update(user);
+            _logger.LogInformation("Password changed successfully.");
             return true;
         }
     }
