@@ -1,14 +1,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using BooksContent.Models;
-//using BooksContent.Services;
+using BooksContent.DTOs;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
+using BooksContent.Models;
+using BooksContent.Services;
 
-namespace UsersandChapter.Controllers
+namespace BooksContent.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("books/{bookId}/chapters")] 
     public class ChapterController : ControllerBase
     {
         private readonly IChapterService _chapterService;
@@ -18,82 +20,128 @@ namespace UsersandChapter.Controllers
             _chapterService = chapterService;
         }
 
-        // GET: Chapters
+        // GET: books/{bookId}/chapters
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Chapter>>> GetChapters()
+        public async Task<ActionResult<IEnumerable<ChapterDTO>>> GetChapters(string bookId)
         {
-            var chapters = await _chapterService.GetChapters(); // Aquí también ajusta el nombre del método
-            return Ok(chapters);
+            var chapters = await _chapterService.GetChaptersAsync(bookId); 
+            
+            if (chapters == null || !chapters.Any())
+            {
+                return NotFound($"No se encontraron capítulos para el bookID: {bookId}");
+            }
+
+            var chapterDTOs = chapters.Select(chapter => MapToDTO(chapter));
+            return Ok(chapterDTOs);
         }
 
-        // GET: Chapters/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Chapter>> GetChapterByID(int id)
+        // GET: books/{bookId}/chapters/{chapterId}
+        [HttpGet("{chapterId}")]
+        public async Task<ActionResult<ChapterDTO>> GetChapterById(string bookId, string chapterId)
         {
-            var chapter = await _chapterService.GetChapterByID(id);
+            var chapter = await _chapterService.GetChapterByIDAsync(chapterId, bookId);
 
             if (chapter == null)
             {
-                return NotFound($"No se encontró un perfil con el ID {id}.");
+                return NotFound($"No se encontró el capítulo con id: {chapterId} para el libro con bookId: {bookId}");
             }
 
-            return Ok(chapter);
+            var chapterDTO = MapToDTO(chapter);
+            return Ok(chapterDTO);
         }
 
-        // POST: Chapters
         [HttpPost]
-        public async Task<ActionResult<Chapter>> CreateChapter([FromBody] Chapter chapter)
+        public async Task<ActionResult<ChapterDTO>> CreateChapter([FromBody] ChapterDTO chapterDTO)
         {
-            if (chapter == null)
+            if (chapterDTO == null)
             {
-                return BadRequest("El perfil proporcionado es nulo.");
+                return BadRequest("Los datos del capítulo son nulos.");
             }
+
             try
             {
-                var createdChapter = await _chapterService.CreateChapter(chapter);
+                var chapter = MapFromDTO(chapterDTO);
+                var createdChapter = await _chapterService.CreateChapterAsync(chapter);
                 if (createdChapter == null)
                 {
-                    return NotFound("No se pudo crear el perfil.");
+                    return NotFound("No se pudo crear el capítulo.");
                 }
 
-                return CreatedAtAction(nameof(GetChapterByID), new { id = createdChapter.Id }, createdChapter);
+                var createdChapterDTO = MapToDTO(createdChapter);
+                return CreatedAtAction(nameof(GetChapterById), new { bookId = createdChapterDTO.BookId, chapterId = createdChapter.Id }, createdChapterDTO);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, $"Error interno del servidor al crear el capítulo: {ex}");
             }
-        }   
+        }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteChapter(int id)
+        public async Task<IActionResult> DeleteProfile(string id)
         {
-            var wasDeleted = await _chapterService.DeleteChapter(id);
-
-            if (!wasDeleted)
+            try
             {
-                return NotFound($"No se encontró un perfil con el ID {id}.");
-            }
+                var wasDeleted = await _chapterService.DeleteChapterAsync(id);
+                if (!wasDeleted)
+                {
+                    return NotFound($"Capítulo con ID: {id} no encontrado.");
+                }
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error interno del servidor al eliminar el capítulo con ID: {id}, {ex}");
+            }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutChapter(int id, Chapter chapter)
+        public async Task<IActionResult> UpdateChapter(string bookId, string id, [FromBody] ChapterDTO chapterDTO)
         {
-            if (id != chapter.Id)
+            if (chapterDTO == null || bookId != chapterDTO.BookId)
             {
-                return BadRequest("El ID del perfil no coincide con el ID Proporcionado.");
+                return BadRequest("Los datos del capítulo no son válidos.");
             }
 
-            var updatedChapter = await _chapterService.UpdateChapter(chapter);
-
-            if (updatedChapter == null)
+            try
             {
-                return NotFound($"No se encontró un perfil con el ID {id}.");
-            }
+                var chapter = MapFromDTO(chapterDTO);
+                var updated = await _chapterService.UpdateChapterAsync(id, bookId, chapter);
+                if (!updated)
+                {
+                    return NotFound($"No se encontró el capítulo con ID: {id} para actualizar.");
+                }
 
-            return Ok(updatedChapter);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error interno del servidor al actualizar el capítulo con ID: {id}, {ex}");
+            }
         }
 
+        // Método para mapear Chapter a ChapterDTO
+        private ChapterDTO MapToDTO(Chapter chapter)
+        {
+            return new ChapterDTO
+            {
+                Title = chapter.Title,
+                Number = chapter.Number,
+                Content = chapter.Content,
+                BookId = chapter.BookId
+            };
+        }
+
+        // Método para mapear ChapterDTO a Chapter
+        private Chapter MapFromDTO(ChapterDTO chapterDTO)
+        {
+            return new Chapter
+            {
+                Title = chapterDTO.Title,
+                Number = chapterDTO.Number,
+                Content = chapterDTO.Content,
+                BookId = chapterDTO.BookId
+            };
+        }
     }
 }

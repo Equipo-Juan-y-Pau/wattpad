@@ -1,4 +1,30 @@
-.vs/
+# Carpeta de archivos generados durante la compilación
+*/obj/
 
-**/obj/
-**/bin/
+# Carpeta de archivos binarios generados durante la compilación
+*/bin/
+
+# Carpeta de configuraciones locales de Visual Studio
+**/.vs/
+
+# Archivos de configuración de usuario específicos de Visual Studio
+*.user
+
+# Archivo de solución de usuario específico de Visual Studio
+*.suo
+
+# Carpeta de archivos de registro de la compilación
+*/binlog/
+
+# Carpeta de paquetes de NuGet instalados
+*/packages/
+
+# Carpeta de módulos de Node.js instalados
+*/node_modules/
+
+# Archivos de registro generados por la aplicación
+*.log
+/logs/
+
+# Carpeta de datos de la aplicación, como archivos de base de datos
+*/App_Data/

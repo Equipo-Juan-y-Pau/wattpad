@@ -1,28 +1,35 @@
-// Models/Pedido.cs
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace BooksContent.Models
 {
-    [Table("chapters")]
     public class Chapter
     {
-        [Column("id")]
-        public int Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)] // Para manejar el ID como string en la aplicación
+        [Required]
+        public string? Id { get; set; }
 
-        [Column("title")]
-        public required string Title{ get; set; }
+        [BsonElement("title")]
+        [Required]
+        public string? Title { get; set; }
 
-        [Column("numero")]
-        public string? AvatarURL { get; set; }
+        [BsonElement("number")]
+        [Required]
+        public int Number { get; set; }  // Asumiendo que quieres un número de capítulo
 
-        [Column("fecha_registro")]
-        public string? FechaRegistro { get; set; }
+        [BsonElement("publishedDate")]
+        [Required]
+        public DateTime? PublishedDate { get; set; }  // Asumiendo que tienes una fecha de publicación
 
-        [Column("content")]
+        [BsonElement("content")]
         public string? Content { get; set; }
 
-        [Column("book_id")]
+        [BsonElement("bookId")]
+        [Required]
+        [BsonRepresentation(BsonType.ObjectId)] // Si bookId también es un ObjectId
         public string? BookId { get; set; }
     }
 }

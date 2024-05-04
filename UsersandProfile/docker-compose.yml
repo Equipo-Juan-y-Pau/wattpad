@@ -7,7 +7,7 @@ services:
     image: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init:/docker-entrypoint-initdb.d
+      - ./Infraestructure/init:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_PASSWORD: p2709j0905
       POSTGRES_DB: wattpaddb

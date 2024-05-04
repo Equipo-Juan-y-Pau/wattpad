@@ -13,5 +13,8 @@ namespace UsersandProfile.Repositories
         Task<User?> GetUserById(int id);
 
         Task Update(User userToUpdate);
+        
+        Task<User?> GetUserByUsername(string username);
+    Task<User?> GetUserByEmail(string email);
     }
 }

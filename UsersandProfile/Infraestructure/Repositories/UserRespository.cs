@@ -118,5 +118,45 @@ namespace UsersandProfile.Repositories
                 throw;
             }
         }
+
+    // Buscar usuario por nombre de usuario
+public async Task<User?> GetUserByUsername(string username)
+{
+    _logger.LogInformation($"Buscando usuario por nombre de usuario: {username}");
+    try
+    {
+        var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.Username == username);
+        if (user == null)
+        {
+            _logger.LogWarning($"Usuario con nombre: {username} no encontrado.");
+        }
+        return user;
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, $"Error al buscar usuario con nombre: {username}");
+        throw;
+    }
+}
+
+// Buscar usuario por correo electrónico
+public async Task<User?> GetUserByEmail(string email)
+{
+    _logger.LogInformation($"Buscando usuario por correo electrónico: {email}");
+    try
+    {
+        var user = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+        if (user == null)
+        {
+            _logger.LogWarning($"Usuario con correo: {email} no encontrado.");
+        }
+        return user;
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, $"Error al buscar usuario con correo: {email}");
+        throw;
+    }
+}
     }
 }

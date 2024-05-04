@@ -29,4 +29,24 @@ namespace UsersandProfile.Models
         [Required(ErrorMessage = "La contraseña es obligatoria.")]
         public string? Password { get; set; }
     }
+
+    /// <summary>
+    /// DTO (Data Transfer Object) para las operaciones de Login.
+    /// </summary>
+    public class LoginRequestDto
+    {
+        /// <summary>
+        /// El nombre de usuario o correo electrónico del usuario.
+        /// </summary>
+        /// <example>johndoe o johndoe@example.com</example>
+        [Required(ErrorMessage = "El identificador es obligatorio.")]
+        public string? Identifier { get; set; }
+
+        /// <summary>
+        /// La contraseña para acceder a la cuenta de usuario.
+        /// </summary>
+        /// <example>Pass#1234</example>
+        [Required(ErrorMessage = "La contraseña es obligatoria.")]
+        public string? Password { get; set; }
+    }
 }

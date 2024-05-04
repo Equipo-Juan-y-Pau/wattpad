@@ -4,7 +4,7 @@ namespace UsersandProfile.Services
 {
     public interface IUserService 
     {
-        Task<ServiceResponse<string>> Login(UserDto userDto);
+        Task<ServiceResponse<string>> Login(LoginRequestDto loginRequest);
 
         Task<ServiceResponse<string>> Register(UserDto userDto);
 
