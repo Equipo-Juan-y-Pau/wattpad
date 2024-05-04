@@ -36,5 +36,21 @@ namespace BooksContent.Repositories
             var result = await _chapters.DeleteOneAsync(chapter => chapter.Id == id);
             return result.DeletedCount > 0;
         }
+
+        public async Task<bool> UpdateChapterAsync(string id, string bookId, Chapter chapter)
+        {
+            var filter = Builders<Chapter>.Filter.Eq(c => c.Id, id) & Builders<Chapter>.Filter.Eq(c => c.BookId, bookId);
+            var update = Builders<Chapter>.Update
+                .Set(c => c.Title, chapter.Title)
+                .Set(c => c.Number, chapter.Number)
+                .Set(c => c.PublishedDate, chapter.PublishedDate)
+                .Set(c => c.Content, chapter.Content);
+            
+            var result = await _chapters.UpdateOneAsync(filter, update);
+            return result.ModifiedCount > 0;
+        }
+
     }
+
+    
 }

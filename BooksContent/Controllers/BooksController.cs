@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BooksContent.Models;
 using BooksContent.Services;
@@ -63,7 +64,13 @@ namespace BooksContent.Controllers
                     return BadRequest();
                 }
                 
-                var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                var userId = _httpContextAccessor?.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                
+                if (userId == null)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "UserId no pudo ser obtenido.");
+                }
+
                 book.Id_Autor = userId; 
 
                 var createdBookResponse = await _booksService.AddBook(book);
@@ -90,7 +97,13 @@ namespace BooksContent.Controllers
         {
             try
             {
-                var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                var userId = _httpContextAccessor?.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+                
+                if (userId == null)
+                {
+                    return StatusCode(StatusCodes.Status500InternalServerError, "UserId no pudo ser obtenido.");
+                }
+                
                 var deleted = await _booksService.DeleteBook(id, userId);
 
                 if (!deleted.Success)
@@ -107,34 +120,41 @@ namespace BooksContent.Controllers
         }
 
         [Authorize]
-        [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateBook(string id, [FromBody] Book book)
+[HttpPut("{id}")]
+[ProducesResponseType(StatusCodes.Status204NoContent)]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
+[ProducesResponseType(StatusCodes.Status404NotFound)]
+[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+public async Task<IActionResult> UpdateBook(string id, [FromBody] Book book)
+{
+    try
+    {
+        if (book == null)
         {
-            try
-            {
-                if (book == null)
-                {
-                    return BadRequest();
-                }
-
-                var userId = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
-                var updatedBook = await _booksService.UpdateBook(book, id, userId);
-
-                if (updatedBook.Success == false)
-                {
-                    return NotFound(updatedBook.Message);
-                }
-
-                return CreatedAtRoute("GetBook", new { id = updatedBook.Data.Id }, book);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
+            return BadRequest("El cuerpo del libro no puede ser nulo.");
         }
+
+        var userId = _httpContextAccessor?.HttpContext?.User?.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+
+        if (userId == null)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, "No se pudo obtener el UserId.");
+        }
+
+        var updatedBook = await _booksService.UpdateBook(book, id, userId);
+
+        if (updatedBook == null || updatedBook.Data == null || !updatedBook.Success)
+        {
+            return NotFound(updatedBook?.Message ?? "El libro no pudo ser actualizado o encontrado.");
+        }
+
+        return CreatedAtRoute("GetBook", new { id = updatedBook.Data.Id }, book);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(StatusCodes.Status500InternalServerError, $"Error interno: {ex.Message}");
+    }
+}
+
     }
 }

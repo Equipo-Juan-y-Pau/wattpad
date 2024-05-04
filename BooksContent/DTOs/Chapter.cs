@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace BooksContent.DTOs
 {
-    public class Chapter
+    public class ChapterDTO
     {
         [Required]
         public string? Title { get; set; }

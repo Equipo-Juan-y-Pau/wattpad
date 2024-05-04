@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -61,36 +62,62 @@ namespace UsersandProfile.Services
             return response;
         }
 
-        public async Task<ServiceResponse<string>> Login(UserDto userDto)
+        public async Task<ServiceResponse<string>> Login(LoginRequestDto loginRequest)
         {
             var response = new ServiceResponse<string>();
-            _logger.LogInformation("Attempting user login.");
+            _logger.LogInformation("Intentando iniciar sesión.");
 
             try
             {
-                var user = await _userRepository.UserExists(userDto);
-                if (user == null || !BCrypt.Net.BCrypt.Verify(userDto.Password, user.Password))
+                // Determina si el identificador es un correo electrónico
+                bool isEmail = new EmailAddressAttribute().IsValid(loginRequest.Identifier);
+
+                User? user;
+
+                if (string.IsNullOrWhiteSpace(loginRequest.Identifier))
                 {
-                    _logger.LogWarning("Login failed: Incorrect username or password.");
+                    _logger.LogWarning("El identificador de inicio de sesión está vacío o es nulo.");
                     response.Success = false;
-                    response.Message = "Contraseña incorrecta o usuario no encontrado.";
+                    response.Message = "El identificador de inicio de sesión no puede estar vacío.";
                     return response;
                 }
 
+                if (isEmail)
+                {
+                    // Búsqueda por correo electrónico
+                    user = await _userRepository.GetUserByEmail(loginRequest.Identifier);
+                }
+                else
+                {
+                    // Búsqueda por nombre de usuario
+                    user = await _userRepository.GetUserByUsername(loginRequest.Identifier);
+                }
+
+                // Verificar si el usuario existe y si la contraseña es correcta
+                if (user == null || !BCrypt.Net.BCrypt.Verify(loginRequest.Password, user.Password))
+                {
+                    _logger.LogWarning("Error al iniciar sesión: Nombre de usuario/correo o contraseña incorrectos.");
+                    response.Success = false;
+                    response.Message = "Nombre de usuario/correo o contraseña incorrectos.";
+                    return response;
+                }
+
+                // Generar el token JWT
                 var token = GenerateJWTToken(user);
                 response.Success = true;
                 response.Data = token;
-                _logger.LogInformation("User logged in successfully.");
+                _logger.LogInformation("Inicio de sesión exitoso.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during login.");
+                _logger.LogError(ex, "Error durante el inicio de sesión.");
                 response.Success = false;
-                response.Message = $"Login error: {ex.Message}";
+                response.Message = $"Error durante el inicio de sesión: {ex.Message}";
             }
 
             return response;
         }
+
 
         private string GenerateJWTToken(User user)
         {

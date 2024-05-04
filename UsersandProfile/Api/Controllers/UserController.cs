@@ -30,14 +30,14 @@ namespace UsersandProfile.Controllers
         }
 
         /// <summary>
-        /// Inicia sesión con las credenciales de un usuario.
+        /// Inicia sesión con el nombre de usuario o correo electrónico y una contraseña.
         /// </summary>
-        /// <param name="userDto">Datos del usuario para iniciar sesión.</param>
+        /// <param name="loginRequest">Datos para el inicio de sesión.</param>
         /// <returns>Resultado de la operación de inicio de sesión.</returns>
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] UserDto userDto)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequest)
         {
-            if (userDto == null)
+            if (loginRequest == null)
             {
                 _logger.LogWarning("Intento de inicio de sesión fallido por datos nulos.");
                 return BadRequest("Los datos del usuario son requeridos.");
@@ -45,7 +45,7 @@ namespace UsersandProfile.Controllers
 
             try
             {
-                var resultado = await _userService.Login(userDto);
+                var resultado = await _userService.Login(loginRequest);
                 _logger.LogInformation("Inicio de sesión exitoso.");
                 return Ok(resultado);
             }

@@ -1,4 +1,3 @@
-// Services/ProfileService.cs
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -24,8 +23,8 @@ namespace UsersandProfile.Services
             try
             {
                 _logger.LogInformation("Obteniendo todos los capitulos de la base de datos.");
-                var profiles = await _chapterRepository.GetChaptersAsync();
-                return profiles;
+                var chapters = await _chapterRepository.GetChaptersAsync();
+                return chapters;
             }
             catch (Exception ex)
             {
@@ -53,6 +52,7 @@ namespace UsersandProfile.Services
             try
             {
                 _logger.LogInformation($"Creando un nuevo capitulo");
+                chapter.PublishedDate = DateTime.UtcNow; // Llenar el campo PublishedDate con la fecha y hora actuales
                 return await _chapterRepository.CreateChapterAsync(chapter);
             }
             catch (Exception ex)
@@ -72,6 +72,20 @@ namespace UsersandProfile.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error al intentar eliminar el capitulo");
+                throw;
+            }
+        }
+
+        public async Task<bool> UpdateChapterAsync(string id, string bookId, Chapter chapter)
+        {
+            try
+            {
+                _logger.LogInformation($"Actualizando el capitulo con ID:{id}");
+                return await _chapterRepository.UpdateChapterAsync(id, bookId, chapter);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error al intentar actualizar el capitulo con ID:{id}");
                 throw;
             }
         }
